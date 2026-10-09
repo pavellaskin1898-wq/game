@@ -1,0 +1,53 @@
+/* ===== Меню создания персонажа — копия Fallout 1 (1997) ===== */
+.cc-root{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+ background:rgba(0,0,0,.88);font-family:'Courier New',monospace;color:#e8b64c;}
+.cc-frame{width:min(1020px,96vw);max-height:94vh;display:flex;flex-direction:column;
+ border:3px solid #7a5c1e;background:#0d0a05;box-shadow:0 0 0 2px #000,0 0 40px #000 inset;}
+.cc-head{padding:8px 14px;text-align:center;letter-spacing:3px;font-size:13px;
+ border-bottom:2px solid #7a5c1e;color:#f4cf7d;text-transform:uppercase;background:#151007;}
+.cc-body{display:flex;gap:10px;padding:10px;overflow:auto;}
+.cc-col{display:flex;flex-direction:column;gap:10px;}
+.cc-left{width:300px;flex:none}.cc-mid{flex:1;min-width:280px}.cc-right{width:250px;flex:none}
+.cc-panel{border:2px solid #7a5c1e;background:#120d06;position:relative;}
+.cc-panel::before{content:'';position:absolute;inset:3px;border:1px solid #4a3812;pointer-events:none;}
+.cc-inner{padding:10px;}
+.cc-cap{font-size:11px;letter-spacing:2px;color:#f4cf7d;border-bottom:1px solid #4a3812;padding-bottom:4px;margin-bottom:6px;}
+.cc-namerow{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.cc-lbl{font-size:11px;letter-spacing:1px;color:#a8843c;}
+.cc-input{flex:1;background:#000;border:1px solid #7a5c1e;color:#ffd97a;font:inherit;padding:3px 6px;outline:none;}
+.cc-special{display:flex;flex-direction:column;gap:2px;}
+.cc-tag{display:flex;align-items:center;gap:6px;padding:3px 4px;cursor:pointer;border:1px solid transparent;}
+.cc-tag:hover{background:#1c1409;}
+.cc-tag.sel{border-color:#7a5c1e;background:#1c1409;}
+.cc-letter{width:16px;height:16px;line-height:16px;text-align:center;background:#7a5c1e;color:#0d0a05;font-weight:bold;flex:none;}
+.cc-tagname{width:86px;font-size:11px;letter-spacing:1px;}
+.cc-dots{flex:1;font-size:9px;letter-spacing:1px;color:#e8b64c;white-space:nowrap;}
+.cc-mm{width:20px;height:18px;background:#1c1409;border:1px solid #7a5c1e;color:#e8b64c;font:inherit;cursor:pointer;line-height:1;}
+.cc-mm:hover{background:#e8b64c;color:#0d0a05;}
+.cc-pool{margin-top:8px;font-size:11px;color:#a8843c;}
+.cc-btn{display:block;width:100%;margin-top:8px;padding:6px;background:#1c1409;border:1px solid #7a5c1e;
+ color:#e8b64c;font:inherit;font-size:11px;letter-spacing:1px;cursor:pointer;text-align:center;}
+.cc-btn:hover{background:#e8b64c;color:#0d0a05;}
+.cc-descp{min-height:120px;}
+.cc-big{font-size:20px;letter-spacing:4px;color:#f4cf7d;font-weight:bold;}
+.cc-descp h3{margin:2px 0 6px;font-size:13px;letter-spacing:2px;}
+.cc-descp p{margin:4px 0;font-size:11px;line-height:1.45;color:#c79c4b;}
+.cc-note{color:#8a6c33 !important;font-style:italic;}
+.cc-list{max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+.cc-item{padding:4px 6px;border:1px solid #33260d;cursor:pointer;font-size:10px;}
+.cc-item b{display:block;color:#e8b64c;letter-spacing:1px;}
+.cc-item span{color:#9c7c3c;} .cc-item i{color:#6f5a2a;}
+.cc-item.on{border-color:#e8b64c;background:#241a0b;}
+.cc-item.off{opacity:.35;cursor:not-allowed;}
+.cc-skills .cc-skill{display:flex;justify-content:space-between;font-size:10px;padding:2px 4px;color:#c79c4b;}
+.cc-skill b{color:#ffd97a;}
+.cc-cycle{display:flex;align-items:center;gap:6px;margin:6px 0;}
+.cc-cycle .cc-lbl{width:104px;flex:none;}
+.cc-val{flex:1;text-align:center;font-size:11px;color:#ffd97a;border:1px solid #4a3812;padding:2px 4px;background:#000;}
+.cc-foot{display:flex;gap:10px;align-items:center;padding:10px;border-top:2px solid #7a5c1e;background:#151007;}
+.cc-foot .cc-btn{margin:0;width:auto;padding:8px 16px;flex:none;}
+.cc-go{background:#7a5c1e;color:#0d0a05;font-weight:bold;}
+.cc-hint{flex:1;font-size:10px;color:#6f5a2a;text-align:center;}
+.cc-close{width:26px;height:26px;background:#1c1409;border:1px solid #7a5c1e;color:#e8b64c;cursor:pointer;flex:none;}
+.cc-close:hover{background:#a33;color:#fff;}
+@media (max-width:820px){.cc-body{flex-direction:column}.cc-left,.cc-right{width:auto}}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WASTELAND 2 — Убежище 13</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="charcreate.css">
+</head>
+<body>
+<div id="game-root">
+
+  <div id="viewport">
+    <canvas id="view-iso"></canvas>
+    <canvas id="view-fp"></canvas>
+    <div id="message-bar"><span id="scr-msg"></span></div>
+  </div>
+
+  <!-- Pip-Boy style HUD -->
+  <div id="hud">
+    <div class="hud-row">
+      <div class="stat hp"><span class="lbl">HP</span><span id="scr-hp">100</span></div>
+      <div class="stat ap"><span class="lbl">AP</span><span id="scr-ap">100</span></div>
+      <div class="stat rad"><span class="lbl">RAD</span><span id="scr-rad">0</span></div>
+      <div class="stat caps"><span class="lbl">CAPS</span><span id="scr-caps">0</span></div>
+      <div class="stat mod"><span class="lbl">МОДУЛИ</span><span id="scr-mod">0/3</span></div>
+    </div>
+    <div class="hud-row second">
+      <div class="weapon" id="scr-weapon">10mm SMG</div>
+      <div class="ammo"><span id="scr-clip">24/24</span> · <span id="scr-ammo">60</span></div>
+      <div class="viewname" id="scr-vname">ISO [F]</div>
+    </div>
+    <div id="objective">Задача: <span id="scr-obj">Найдите 3 модуля управления</span></div>
+  </div>
+
+  <div id="controls-hint">
+    WASD — движение · Shift — бег · <b>E</b> — действие · <b>F</b> — вид ISO/FP · ЛКМ — огонь · R — перезарядка · 1/2 — оружие
+  </div>
+
+  <!-- Title screen -->
+  <div id="screen-title" class="overlay">
+    <div class="panel">
+      <div class="vault-gear"></div>
+      <h1>WASTELAND&nbsp;2</h1>
+      <h2>УБЕЖИЩЕ&nbsp;13</h2>
+      <p>Реактор молчит. Охрана мертва. В коридорах кто-то шуршит.<br>
+      Найдите три модуля управления, запустите реактор,<br>
+      разблокируйте гейт и выйдите в Пустошь.</p>
+      <p class="press">— «Я — новый человек»: создание персонажа как в Fallout 1 —</p>
+      <button id="btn-char" class="press-btn">СОЗДАНИЕ ПЕРСОНАЖА · S.P.E.C.I.A.L.</button>
+    </div>
+  </div>
+
+  <!-- End screen -->
+  <div id="screen-end" class="overlay hidden">
+    <div class="panel">
+      <h1 id="end-title">ВЫ ВЫШЛИ В ПУСТОШЬ</h1>
+      <p id="end-sub"></p>
+      <p class="press">— Пробел — заново —</p>
+    </div>
+  </div>
+
+</div>
+<script src="game.js"></script>
+<script src="charcreate.js"></script>
+</body>
+</html>

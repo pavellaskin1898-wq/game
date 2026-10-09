@@ -1,0 +1,52 @@
+/* WASTELAND 2 — retro CRT vault terminal look */
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:#05070a;overflow:hidden;}
+body{font-family:'Courier New',monospace;color:#c9d4a8;}
+#game-root{position:relative;width:100vw;height:100vh;}
+#viewport{position:absolute;inset:0;}
+#viewport canvas{position:absolute;inset:0;display:block;cursor:crosshair;}
+#view-fp{display:none;}
+
+/* scanline overlay */
+#viewport::after{content:"";position:absolute;inset:0;pointer-events:none;
+ background:repeating-linear-gradient(0deg,rgba(0,0,0,0.18) 0 1px,transparent 1px 3px);
+ mix-blend-mode:multiply;}
+
+#hud{position:absolute;left:0;right:0;top:0;padding:8px 14px;pointer-events:none;
+ background:linear-gradient(180deg,rgba(8,12,8,0.85),rgba(8,12,8,0));}
+.hud-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+.stat{border:1px solid #4a5a2a;background:rgba(20,26,14,0.7);padding:3px 10px;border-radius:3px;font-size:15px;color:#e2ecb4;text-shadow:0 0 6px rgba(160,220,80,0.5);}
+.stat .lbl{color:#8aa050;font-size:11px;margin-right:6px;letter-spacing:1px;}
+.stat.hp{min-width:86px;}
+.hud-row.second{margin-top:6px;font-size:13px;color:#9db06a;}
+.weapon{border:1px solid #4a5a2a;padding:2px 8px;background:rgba(20,26,14,0.7);}
+.ammo{color:#e2ecb4;}
+.viewname{margin-left:auto;color:#c9b458;}
+#objective{margin-top:6px;font-size:13px;color:#7fae5a;text-shadow:0 0 5px rgba(120,200,80,0.35);}
+#objective span{color:#d8e6a8;}
+
+#message-bar{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);
+ max-width:80%;padding:8px 18px;background:rgba(10,14,8,0.85);border:1px solid #4a5a2a;
+ color:#e2ecb4;font-size:15px;text-align:center;border-radius:3px;
+ text-shadow:0 0 6px rgba(160,220,80,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#message-bar:empty,#message-bar:has(#scr-msg:empty){opacity:0;}
+
+#controls-hint{position:absolute;left:0;right:0;bottom:0;padding:8px 14px;font-size:12px;
+ color:#6f8048;background:linear-gradient(0deg,rgba(8,12,8,0.9),rgba(8,12,8,0));text-align:center;pointer-events:none;}
+#controls-hint b{color:#c9b458;}
+
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+ background:radial-gradient(circle at 50% 45%,rgba(10,16,8,0.92),rgba(3,5,3,0.98));z-index:10;}
+.overlay.hidden{display:none;}
+.panel{text-align:center;padding:40px 60px;border:2px solid #4a5a2a;background:rgba(12,18,10,0.9);
+ box-shadow:0 0 40px rgba(120,180,60,0.15),inset 0 0 30px rgba(0,0,0,0.6);border-radius:6px;max-width:90vw;}
+.panel h1{font-size:44px;letter-spacing:8px;color:#c9b458;text-shadow:0 0 18px rgba(200,170,60,0.6);}
+.panel h2{font-size:20px;letter-spacing:12px;color:#8aa050;margin:6px 0 22px;}
+.panel p{color:#a8bc78;font-size:15px;line-height:1.7;}
+.press{margin-top:26px;color:#e2ecb4;animation:blink 1.2s steps(2) infinite;}
+@keyframes blink{50%{opacity:0.15;}}
+.vault-gear{width:90px;height:90px;margin:0 auto 18px;border-radius:50%;
+ border:10px dashed #8a6b3d;background:radial-gradient(circle,#d68f4a 20%,#8a5a2a 45%,#3a2a12 70%);
+ box-shadow:0 0 25px rgba(214,143,74,0.4);animation:spin 24s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#screen-end h1{color:#e2ecb4;}
