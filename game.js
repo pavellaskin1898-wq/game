@@ -155,8 +155,8 @@ const state={mode:'title',t:0,msg:'',msgT:0,killCount:0,shake:0};
 function say(text,dur){state.msg=text;state.msgT=dur||3;}
 const keys={};let mouseDown=false,mouseDX=0;
 window.addEventListener('keydown',e=>{
- if(state.mode==='title'){startGame();return;}
- if(state.mode==='end'){if(e.code==='Space')startGame();return;}
+ if(state.mode==='title'){window.CharCreate&&CharCreate.open(applyChar);return;}
+ if(state.mode==='end'){if(e.code==='Space'){window.CharCreate&&CharCreate.open(applyChar);return;}}
  keys[e.code]=true;
  if(e.code==='KeyE')interact();
  if(e.code==='KeyR')reload();
@@ -244,8 +244,10 @@ function hitscan(angle,dmg){
    if(e.dead)continue;
    const rr=e.cls==='rat'?12:(e.cls==='mutant'?16:14);
    if(dist(x,y,e.x,e.y)<rr){
-    const head=Math.random()<0.18;
-    const dd=head?Math.round(dmg*2):dmg;
+    const critP=(player.crit||5)/100;
+    const head=Math.random()<0.18||Math.random()<critP;
+    let dd=Math.round(dmg*(player.dmgMul||1));
+    if(head)dd*=2;
     e.hp-=dd;e.alert=8;e.state='chase';
     addFloater(e.x,e.y-20,'-'+dd+(head?' HEAD!':''),head?'#ff6a4a':'#ffd75a');
     spawnBlood(x,y);SFX.hit();
@@ -357,7 +359,7 @@ function update(dt){
   if(mouseDX){player.dir+=mouseDX*0.0028;mouseDX=0;}
   if(mx!==0||my!==0){
    const run=(keys.ShiftLeft||keys.ShiftRight)&&player.ap>1;
-   const sp=player.speed*(run?player.runMul:1)*dt;
+   const sp=player.speed*(player.speedMul||1)*(run?player.runMul:1)*dt;
    if(run)player.ap=Math.max(0,player.ap-dt*20);
    const fx=Math.cos(player.dir),fy=Math.sin(player.dir);
    const rx=Math.cos(player.dir+Math.PI/2),ry=Math.sin(player.dir+Math.PI/2);
@@ -371,7 +373,7 @@ function update(dt){
  }else{
   if(mx||my){
    const run=(keys.ShiftLeft||keys.ShiftRight)&&player.ap>1;
-   const sp=player.speed*(run?player.runMul:1)*dt;
+   const sp=player.speed*(player.speedMul||1)*(run?player.runMul:1)*dt;
    if(run)player.ap=Math.max(0,player.ap-dt*20);
    const wx=mx-my,wy=mx+my;
    const L=Math.hypot(wx,wy)||1;
@@ -688,6 +690,20 @@ function startGame(){
  document.getElementById('screen-title').classList.add('hidden');
  resetGame();
 }
+let CHAR=null;
+function applyChar(ch){
+ CHAR=ch;
+ player.maxhp=ch.hpMax;player.hp=ch.hpMax;
+ player.maxap=50+ch.apMax*5;player.ap=player.maxap;
+ player.speedMul=ch.speedMul;player.dmgMul=ch.dmgMul;player.crit=ch.crit;
+ say(ch.name+' · S:'+ch.tag[0]+' P:'+ch.tag[1]+' E:'+ch.tag[2]+' Ch:'+ch.tag[3]+' I:'+ch.tag[4]+' A:'+ch.tag[5]+' L:'+ch.tag[6]+' · HP '+ch.hpMax+' · крит '+ch.crit+'%',7);
+ if(ch.perks.length)say('Перки: '+ch.perks.join(', '),6);
+ startGame();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ const b=document.getElementById('btn-char');
+ if(b)b.onclick=()=>CharCreate.open(applyChar);
+});
 function resetGame(){
  buildMap();spawnEnemiesAndItems();
  player.x=VAULT.spawn.x;player.y=VAULT.spawn.y;
