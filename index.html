@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WASTELAND 2 — Fallout-like FPS in the browser</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-container">
+  <canvas id="scene"></canvas>
+
+  <!-- Pip-Boy style HUD -->
+  <div id="hud">
+    <div class="hud-corner tl">
+      <div class="stat-row"><span class="stat-label">HP</span><div class="bar"><div id="hp-bar"></div></div><span id="hp-text">100/100</span></div>
+      <div class="stat-row"><span class="stat-label">AP</span><div class="bar ap"><div id="ap-bar"></div></div><span id="ap-text">100</span></div>
+      <div class="stat-row"><span class="stat-label">RAD</span><div class="bar rad"><div id="rad-bar"></div></div><span id="rad-text">0</span></div>
+    </div>
+    <div class="hud-corner tr">
+      <div id="credits">₪ 137</div>
+      <div id="ammo-text">12mm AP — ∞</div>
+      <div id="loc-text">VAULT 13 — CORRIDOR</div>
+    </div>
+    <div class="hud-corner bl">
+      <div id="msg-log"></div>
+    </div>
+    <div class="hud-corner br">
+      <canvas id="minimap" width="140" height="140"></canvas>
+    </div>
+    <div id="crosshair">+</div>
+    <div id="vignette"></div>
+    <div id="damage-flash"></div>
+  </div>
+
+  <!-- Start / pause screen -->
+  <div id="start-screen">
+    <div id="start-box">
+      <pre id="logo">
+██╗    ██╗ █████╗ ███████╗████████╗███████╗███╗   ██╗ █████╗ ███╗   ██╗████████╗
+██║    ██║██╔══██╗██╔════╝╚══██╔══╝██╔════╝████╗  ██║██╔══██╗████╗  ██║╚══██╔══╝
+██║ █╗ ██║███████║███████╗   ██║   █████╗  ██╔██╗ ██║███████║██╔██╗ ██║   ██║
+██║███╗██║██╔══██║╚════██║   ██║   ██╔══╝  ██║╚██╗██║██╔══██║██║╚██╗██║   ██║
+╚███╔███╔╝██║  ██║███████║   ██║   ███████╗██║ ╚████║██║  ██║██║ ╚████║   ██║
+ ╚══╝╚══╝ ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝
+                  ██████╗ ██╗   ██╗████████╗██████╗  ██████╗
+                  ██╔══██╗╚██╗ ██╔╝╚══██╔══╝██╔══██╗██╔═══██╗
+                  ██████╔╝ ╚████╔╝    ██║   ██████╔╝██║   ██║
+                  ██╔══██╗  ╚██╔╝     ██║   ██╔══██╗██║   ██║
+                  ██████╔╝   ██║      ██║   ██║  ██║╚██████╔╝
+                  ╚═════╝    ╚═╝      ╚═╝   ╚═╝  ╚═╝ ╚═════╝</pre>
+      <div class="subtitle">Пустошь ждёт, бродяга. Версия браузерная, от первого лица.</div>
+      <div class="controls">
+        <b>Управление:</b><br>
+        W/A/S/D — движение &nbsp;|&nbsp; Мышь — обзор (клик по экрану = захват курсора)<br>
+        ЛКМ — стрельба &nbsp;|&nbsp; R — перезарядка &nbsp;|&nbsp; E — взаимодействие<br>
+        Shift — бег (тратит AP) &nbsp;|&nbsp; 1/2 — смена оружия &nbsp;|&nbsp; Esc — пауза
+      </div>
+      <button id="btn-start">ВОЙТИ В ПУСТОШЬ</button>
+      <div class="hint">Найди 3 модуля управления и выберись из Убежища. Осторожно: когти смерти и рейдеры не дремлют.</div>
+    </div>
+  </div>
+
+  <div id="end-screen" class="hidden">
+    <div id="end-box">
+      <div id="end-title">КОНЕЦ</div>
+      <div id="end-text"></div>
+      <button id="btn-restart">ЗАНОВО</button>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+/* WASTELAND 2 — ретро-FPS в стиле Pip-Boy */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+
+body {
+  font-family: "Courier New", Courier, monospace;
+  color: #ffb000;
+}
+
+#game-container { position: relative; width: 100vw; height: 100vh; }
+
+#scene {
+  width: 100%; height: 100%; display: block;
+  image-rendering: pixelated;
+  cursor: crosshair;
+}
+
+/* ---------- HUD ---------- */
+#hud { position: absolute; inset: 0; pointer-events: none; }
+
+.hud-corner { position: absolute; padding: 14px; text-shadow: 0 0 6px rgba(255,176,0,.7); }
+.tl { top: 0; left: 0; }
+.tr { top: 0; right: 0; text-align: right; }
+.bl { bottom: 0; left: 0; max-width: 46%; }
+.br { bottom: 0; right: 0; }
+
+.stat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 14px; }
+.stat-label { width: 32px; font-weight: bold; }
+.bar { width: 140px; height: 12px; border: 1px solid #ffb000; background: rgba(255,176,0,.08); }
+.bar > div { height: 100%; background: #ffb000; width: 100%; transition: width .15s; }
+.bar.ap > div { background: #58d2ff; }
+.bar.rad > div { background: #6cff5c; width: 0%; }
+
+#credits { font-size: 18px; font-weight: bold; }
+#ammo-text, #loc-text { font-size: 13px; opacity: .85; margin-top: 4px; }
+
+#msg-log div { font-size: 13px; line-height: 1.45; opacity: .9; }
+#msg-log div.new { color: #ffe28a; }
+
+#minimap { border: 1px solid #ffb000; background: rgba(0,0,0,.55); opacity: .85; }
+
+#crosshair {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 26px; color: rgba(255,255,255,.75); text-shadow: 0 0 4px #000;
+}
+
+#vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%);
+}
+
+#damage-flash {
+  position: absolute; inset: 0; background: rgba(200,0,0,.35);
+  opacity: 0; transition: opacity .1s;
+}
+
+/* ---------- Screens ---------- */
+#start-screen, #end-screen {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.88); z-index: 10;
+}
+.hidden { display: none !important; }
+
+#start-box, #end-box {
+  max-width: 860px; padding: 30px 40px; text-align: center;
+  border: 2px solid #ffb000; background: rgba(20,12,0,.9);
+  box-shadow: 0 0 40px rgba(255,176,0,.25), inset 0 0 60px rgba(255,120,0,.08);
+}
+
+#logo { font-size: 9px; line-height: 1.05; color: #ffcc44; overflow-x: auto; }
+
+.subtitle { margin: 16px 0; font-size: 16px; color: #ffe28a; }
+.controls { font-size: 13px; line-height: 1.7; color: #d9a441; margin-bottom: 18px; }
+.hint { margin-top: 14px; font-size: 12px; opacity: .7; }
+
+button {
+  font-family: inherit; font-size: 18px; letter-spacing: 2px;
+  padding: 12px 34px; background: #ffb000; color: #1a0e00;
+  border: none; cursor: pointer; text-transform: uppercase; font-weight: bold;
+}
+button:hover { background: #ffd24a; box-shadow: 0 0 18px rgba(255,210,74,.6); }
+
+#end-title { font-size: 42px; letter-spacing: 6px; margin-bottom: 14px; }
+#end-text { font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+
+/* CRT scanline effect */
+#game-container::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 5;
+  background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0 2px, rgba(0,0,0,.12) 2px 4px);
+}
