@@ -5,10 +5,15 @@
 
 ## Запуск
 ```bash
-# вариант 1: просто открыть index.html в браузере
-# вариант 2: локальный сервер
-python3 -m http.server 8000
-# затем открыть http://localhost:8000
+# Linux / macOS — файл запуска (сам поднимет сервер и откроет браузер)
+./run.sh          # порт 8000 по умолчанию
+./run.sh 9000     # или свой порт
+
+# Windows — двойной клик по run.bat (или запустить из cmd)
+run.bat
+
+# вручную: просто открыть index.html в браузере
+# или: python3 -m http.server 8000 → http://localhost:8000
 ```
 
 ## Как играть
@@ -20,6 +25,7 @@ python3 -m http.server 8000
 - HUD в стиле Pip-Boy: HP / AP / радиация, кредиты, боезапас, лог событий, миникарта, CRT-развёртка.
 
 ## Файлы
+- `run.sh` / `run.bat` — запуск игры в один клик (Linux-macOS / Windows)
 - `index.html` — разметка и экраны
 - `style.css` — Pip-Boy HUD и CRT-эффект
 - `game.js` — движок: карта, raycasting, ИИ, оружие, звук (WebAudio, без файлов)
