@@ -141,7 +141,8 @@ const player={x:0,y:0,dir:0,isoDir:-Math.PI/2,speed:110,runMul:1.8,r:10,hp:100,m
  view:'iso',weapon:0,weapons:[
  {name:'10mm SMG',sprite:'handsRifle',dmg:7,spread:0.09,rate:0.14,clip:24,ammo:'ammo10',auto:true,sfx:'smg'},
  {name:'Pipe Rifle',sprite:'handsPistol',dmg:16,spread:0.04,rate:0.55,clip:6,ammo:'ammoShot',auto:false,sfx:'shotgun'}],
- clips:[24,6],reserve:{ammo10:60,ammoShot:12},reloading:0,fireCool:0,bob:0,recoil:0,flash:0,hurt:0,invuln:0,keycard:false};
+ clips:[24,6],reserve:{ammo10:60,ammoShot:12},reloading:0,fireCool:0,bob:0,recoil:0,flash:0,hurt:0,invuln:0,keycard:false,
+ aim:35}; // шанс попадания = SKILL + aim - дистанция/10 (как в F1)
 
 // ===== AUDIO =====
 let AC=null;
@@ -244,6 +245,9 @@ function hitscan(angle,dmg){
    if(e.dead)continue;
    const rr=e.cls==='rat'?12:(e.cls==='mutant'?16:14);
    if(dist(x,y,e.x,e.y)<rr){
+    // шанс попадания как в Fallout 1: навык + прицел - дистанция; промах = пуля прошла мимо
+    const chance=clamp(player.aim+ (CHAR?CHAR.skill.SMALL_ARMS||35:35) - d/10,8,95);
+    if(Math.random()*100>chance)return;
     const critP=(player.crit||5)/100;
     const head=Math.random()<0.18||Math.random()<critP;
     let dd=Math.round(dmg*(player.dmgMul||1));
@@ -696,7 +700,11 @@ function applyChar(ch){
  player.maxhp=ch.hpMax;player.hp=ch.hpMax;
  player.maxap=50+ch.apMax*5;player.ap=player.maxap;
  player.speedMul=ch.speedMul;player.dmgMul=ch.dmgMul;player.crit=ch.crit;
- say(ch.name+' · S:'+ch.tag[0]+' P:'+ch.tag[1]+' E:'+ch.tag[2]+' Ch:'+ch.tag[3]+' I:'+ch.tag[4]+' A:'+ch.tag[5]+' L:'+ch.tag[6]+' · HP '+ch.hpMax+' · крит '+ch.crit+'%',7);
+ // навыки и перки из создания персонажа влияют на бой (как в F1)
+ player.aim=35+(ch.skill.SMALL_ARMS||35)+(ch.tag[1]>=6?10:0); // Night Vision/PERK-бонус к прицелу
+ if(ch.perks.includes('РАЗБИРАЮЩИЙСЯ В ОРУЖИИ'))player.aim+=5;
+ if(ch.traits.includes('СЛЕПОЙ'))player.aim-=10;
+ say(ch.name+' · S:'+ch.tag[0]+' P:'+ch.tag[1]+' E:'+ch.tag[2]+' Ch:'+ch.tag[3]+' I:'+ch.tag[4]+' A:'+ch.tag[5]+' L:'+ch.tag[6]+' · HP '+ch.hpMax+' · Стрелковое '+(ch.skill.SMALL_ARMS||'-')+' · крит '+ch.crit+'%',7);
  if(ch.perks.length)say('Перки: '+ch.perks.join(', '),6);
  startGame();
 }

@@ -55,10 +55,34 @@ const AGES=[16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
 const LVL=['ОЧ. МАЛО','МАЛО','НЕМНОГО','МНОГО','ОЧ. МНОГО'];
 const GEND=['МУЖСКОЙ','ЖЕНСКИЙ'];
 
+// базовые значения навыков как в Fallout 1: стартовые + бонусы от S.P.E.C.I.A.L.
+function baseSkills(t){
+ const b={};
+ SKILLS.forEach(s=>{b[s[0]]=s[2];});
+ b.SMALL_ARMS += 2*t[5];        // Ловкость
+ b.BIG_ARMS   += 2*t[0];        // Сила
+ b.MELEE      += 2*t[0];
+ b.UNARMED    += 2*t[0];
+ b.THROWING   += t[5];
+ b.FIRST_AID  += 2*t[4];        // Интеллект
+ b.DOCTOR     += t[4] + t[1];   // INTELLIGENCE + WISDOM-аналог (Perception)
+ b.SNEAK      += 2*t[5];
+ b.LOCKPICK   += t[1] + t[5];
+ b.STEAL      += t[5];
+ b.TRAPS      += t[1] + t[4];
+ b.SCIENCE    += 2*t[4];
+ b.REPAIR     += t[4];
+ b.SPEECH     += 3*t[3];        // Харизма
+ b.BARTER     += 3*t[3];
+ b.GAMBLING   += t[6]*2;        // Удача
+ b.OUTDOORSMAN+= t[1] + t[4];
+ return b;
+}
 const c={tag:[5,5,5,5,5,5,5,5],skill:{},perk:[],trait:[],age:25,drunk:2,gender:0,name:'',pool:5};
-SKILLS.forEach(s=>c.skill[s[0]]=s[2]);
+function resetSkills(){const b=baseSkills(c.tag);SKILLS.forEach(s=>{c.skill[s[0]]=b[s[0]];});}
+resetSkills();
 
-let root=null,hudL=null,hudR=null,selTag=0;
+let root=null,selTag=0,doneCb=null;
 
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
 function btnRow(parent,label,cb,cls){const b=el('button','cc-btn'+(cls?' '+cls:''),label);b.onclick=cb;parent.appendChild(b);return b;}
@@ -71,7 +95,8 @@ function panel(cls){
 }
 
 function open(onDone){
- if(root){root.style.display='flex';return;}
+ doneCb=onDone||doneCb;
+ if(root){root.style.display='flex';refreshAll();return;}
  root=el('div','cc-root');
  root.innerHTML='<div class="cc-frame">'
  +'<div class="cc-head">УБЕЖИЩЕ 13 · АННО 2161 · РЕГИСТРАЦИЯ НОВОГО ЖИТЕЛЯ</div>'
@@ -139,11 +164,13 @@ function open(onDone){
 
  // ==== ПРАВО: навыки + анкета ====
  const sk=panel();sk.outer.className='cc-panel cc-listp';
- sk.inner.appendChild(el('div','cc-cap','НАВЫКИ  (+5 очков, базовые отмечены ★)'));
+ sk.inner.appendChild(el('div','cc-cap','НАВЫКИ  (очков: <b id="cc-skillpool">5</b>, клик — +1)'));
  const sl=el('div','cc-list cc-skills');sk.inner.appendChild(sl);
- SKILLS.forEach(s=>{
-  const it=el('div','cc-skill');
-  it.innerHTML='<span>'+(s[2]>0?'★ ':'')+s[1]+'</span><b id="ccsk-'+s[0]+'">'+s[2]+'</b>';
+ SKILLS.forEach((s,i)=>{
+  const it=el('div','cc-skill'+(s[2]>0?' tag':''));
+  it.innerHTML='<span>'+(s[2]>0?'★ ':'')+s[1]+'</span><b>'+c.skill[s[0]]+'</b>';
+  it._k=s[0]; // ключ навыка (свойство, не dataset — надёжнее при innerHTML-пересборке)
+  it.onclick=()=>addSkill(i);
   sl.appendChild(it);
  });
  right.appendChild(sk.outer);
@@ -156,13 +183,18 @@ function open(onDone){
  right.appendChild(q.outer);
 
  // ==== ФУТ ====
- btnRow(foot,'« Я — НОВЫЙ ЧЕЛОВЕК »',()=>{if(!c.name)c.name='Уроженец Убежища';close();onDone&&onDone(snapshot());},'cc-go');
- btnRow(foot,'ПРОДОЛЖИТЬ ▸',()=>{if(!c.name)c.name='Уроженец Убежища';close();onDone&&onDone(snapshot());});
+ btnRow(foot,'« Я — НОВЫЙ ЧЕЛОВЕК »',()=>{if(!c.name)c.name='Уроженец Убежища';close();doneCb&&doneCb(snapshot());},'cc-go');
+ btnRow(foot,'ПРОДОЛЖИТЬ ▸',()=>{if(!c.name)c.name='Уроженец Убежища';close();doneCb&&doneCb(snapshot());});
  foot.appendChild(el('span','cc-hint','[Esc] — вернуться к игре без изменений'));
  const esc=el('button','cc-close','✕');esc.onclick=()=>{close();};foot.appendChild(esc);
 
- refreshSpecial();renderPerks();renderTraits();
+ refreshAll();
+ root.tabIndex=-1;root.focus();
 }
+
+// единый пересчёт всего UI (при повторном open)
+function refreshAll(){refreshSpecial();renderPerks();renderTraits();updateDerived();
+ const d=document.getElementById('cc-desc');if(d)showDesc();}
 
 function mkCycle(label,get,set,len,names){
  const row=el('div','cc-cycle');
@@ -177,7 +209,19 @@ function chgTag(i,d){
  const v=c.tag[i]+d;
  if(d>0){if(c.pool<=0||v>10)return;c.pool--;}
  else{if(v<1)return;c.pool++;}
- c.tag[i]=v;refreshSpecial();showDesc();updateDerived();
+ c.tag[i]=v;
+ // пересчёт базовых навыков: сохранённые вложенные очки + новые базовые (как при level-up в F1)
+ const oldBase=baseSkills(c.tag.slice(0,i).concat([c.tag[i]-d],c.tag.slice(i+1)));
+ const nb=baseSkills(c.tag);
+ SKILLS.forEach(s=>{const inv=c.skill[s[0]]-oldBase[s[0]];c.skill[s[0]]=Math.min(99,Math.max(s[2],nb[s[0]]+inv));});
+ refreshSpecial();showDesc();updateDerived();
+}
+// ------- навыки: 5 очков на создание, +1 за клик -------
+let skillPool=5;
+function addSkill(i){
+ const k=SKILLS[i][0];
+ if(skillPool<=0||c.skill[k]>=99)return;
+ c.skill[k]++;skillPool--;updateDerived();
 }
 function perkOK(i){
  const t=c.tag;switch(PERKS[i][0]){
@@ -194,8 +238,8 @@ function tog(arr,i,max){
 function renderList(node,arr,data){
  [...node.children].forEach((ch,j)=>{ch.classList.toggle('on',arr.includes(j));});
 }
-function renderPerks(){renderList(root.querySelector('#cc-desc').nextSibling?document.querySelectorAll('.cc-list')[0]:document.querySelectorAll('.cc-list')[0],c.perk);}
-function renderTraits(){renderList(document.querySelectorAll('.cc-list')[1],c.trait);}
+function renderPerks(){const n=document.querySelectorAll('.cc-list')[0];if(n)[...n.children].forEach((ch,j)=>{ch.classList.toggle('on',c.perk.includes(j));ch.classList.toggle('off',PERKS[j][3].startsWith('Требует')&&!perkOK(j));});}
+function renderTraits(){const n=document.querySelectorAll('.cc-list')[1];if(n)[...n.children].forEach((ch,j)=>{ch.classList.toggle('on',c.trait.includes(j));});}
 
 function refreshSpecial(){
  const rows=root.querySelectorAll('.cc-tag');
@@ -213,31 +257,45 @@ function showDesc(){
 }
 function updateDerived(){
  const hp=15+c.tag[2]*3, ap=5+Math.floor(c.tag[5]/2);
- const pts=SKILLS.filter(s=>s[2]>0).length; // базовые можно качать бесплатно
- let spent=0;SKILLS.forEach(s=>{spent+=c.skill[s[0]]-s[2];});
- SKILLS.forEach(s=>{const n=document.getElementById('ccsk-'+s[0]);if(n)n.textContent=c.skill[s[0]];});
+ root.querySelectorAll('.cc-skill').forEach(it=>{const b=it.querySelector('b');if(b&&c.skill[it._k]!==undefined)b.textContent=c.skill[it._k];});
+ const sp=document.getElementById('cc-skillpool');if(sp)sp.textContent=skillPool;
  const f=document.querySelector('.cc-foot');if(!f)return;
  f.dataset.hp=hp;f.dataset.ap=ap;
 }
 
 function rollAll(){
- for(let i=0;i<7;i++){const a=Math.floor(Math.random()*7),b=Math.floor(Math.random()*7);
-  const va=c.tag[a]+1,vb=c.tag[b]-1;if(va<=10&&vb>=1&&a!==b){c.tag[a]=va;c.tag[b]=vb;}}
+ // как в Fallout 1: случайное распределение 40 очков (5 базовых + 35 свободных), без повторов, min..max
+ do{
+  c.tag=[1,1,1,1,1,1,1].map(()=>5);c.pool=5;
+  const lo=[2,2,2,2,3,3,4],hi=[8,7,7,6,9,8,9]; // ST PE EN CH IN AG LK
+  for(let k=0;k<35;k++){
+   const cand=[];for(let i=0;i<7;i++)if(c.tag[i]<hi[i])cand.push(i);
+   if(!cand.length)break;const i=cand[Math.floor(Math.random()*cand.length)];c.tag[i]++;
+  }
+ }while(new Set(c.tag).size!==7);
+ resetSkills();skillPool=5;
  c.age=AGES[Math.floor(Math.random()*AGES.length)];
  c.drunk=Math.floor(Math.random()*LVL.length);
  c.perk=[];while(c.perk.length<3){const i=Math.floor(Math.random()*PERKS.length);if(!c.perk.includes(i)&&perkOK(i))c.perk.push(i);}
  c.trait=[];for(let k=0;k<2;k++){const i=Math.floor(Math.random()*TRAITS.length);if(!c.trait.includes(i))c.trait.push(i);}
- refreshSpecial();renderPerks();renderTraits();
+ refreshAll();
 }
 
 function snapshot(){
  return {name:c.name||'Уроженец Убежища',tag:c.tag.slice(),
   hpMax:15+c.tag[2]*3,apMax:5+Math.floor(c.tag[5]/2),
   speedMul:0.9+c.tag[5]*0.03, dmgMul:0.85+c.tag[0]*0.06,
-  crit:5+c.tag[6], perks:c.perk.map(i=>PERKS[i][1]), traits:c.trait.map(i=>TRAITS[i][1]),
+  crit:5+c.tag[6], skill:Object.assign({},c.skill),
+  perks:c.perk.map(i=>PERKS[i][1]), traits:c.trait.map(i=>TRAITS[i][1]),
   age:c.age,gender:c.gender};
 }
 function close(){if(root)root.style.display='none';}
+
+// Esc — закрыть без изменений (обработчик на window живёт всё время игры)
+window.addEventListener('keydown',e=>{
+ if(!root||root.style.display==='none')return;
+ if(e.key==='Escape'){e.stopPropagation();close();}
+},true);
 
 window.CharCreate={open:open};
 })();

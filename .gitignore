@@ -1,2 +1,5 @@
-# Compressed files
-*.tar.gz
+# Dependencies
+node_modules/
+
+# Lock files (optional: keep package-lock.json if you want deterministic builds, but often ignored in dev contexts)
+package-lock.json
